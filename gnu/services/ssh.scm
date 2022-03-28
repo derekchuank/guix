@@ -515,6 +515,9 @@ of user-name/file-like tuples."
   (define pid-file
     (openssh-configuration-pid-file config))
 
+  (define port-number
+    (openssh-configuration-port-number config))
+
   (define openssh-command
     #~(list (string-append #$(openssh-configuration-openssh config) "/sbin/sshd")
             "-D" "-f" #$(openssh-config-file config)))
@@ -523,9 +526,16 @@ of user-name/file-like tuples."
          (documentation "OpenSSH server.")
          (requirement '(syslogd loopback))
          (provision '(ssh-daemon ssh sshd))
-         (start #~(make-forkexec-constructor #$openssh-command
-                                             #:pid-file #$pid-file))
-         (stop #~(make-kill-destructor))
+         (start #~(if (defined? 'make-inetd-constructor)
+                      (make-inetd-constructor
+                       (append #$openssh-command '("-i"))
+                       (make-socket-address AF_INET INADDR_ANY
+                                            #$port-number))
+                      (make-forkexec-constructor #$openssh-command
+                                                 #:pid-file #$pid-file)))
+         (stop #~(if (defined? 'make-inetd-destructor)
+                     (make-inetd-destructor)
+                     (make-kill-destructor)))
          (auto-start? (openssh-auto-start? config)))))
 
 (define (openssh-pam-services config)
