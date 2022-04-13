@@ -25501,73 +25501,67 @@ standard error channel (stderr) in your program.")
 (define-public python-anyio
   (package
     (name "python-anyio")
-    (version "3.3.0")
+    (version "3.5.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "anyio" version))
        (sha256
         (base32
-         "0x03hsprdrs86wjjkj96zm2jswy3a5bgyrknyi58pzz5hdsscmxf"))))
+         "19m58805wir4i2s45dd5ynwlzb7ky1218isbir53gpqzzgigzbm0"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
        (modify-phases %standard-phases
-         (add-after 'unpack 'fix-compatibility
-           (lambda _
-             (substitute* "tests/test_taskgroups.py"
-               (("import pytest")
-                "import pytest\nimport _pytest\nfrom _pytest import logging")
-               (("pytest.LogCaptureFixture")
-                "_pytest.logging.LogCaptureFixture"))))
          (replace 'check
-           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+           (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
-               (add-installed-pythonpath inputs outputs)
-               (invoke "pytest" "-vv" "-p" "no:asyncio"
-                       "-m" "not network"
-                       "-k"
-                       (string-append
-                        "not test_is_block_device"
+               (invoke
+                "pytest" "-vv" "-p" "no:asyncio"
+                "-m" "not network"
+                "-k"
+                (string-append
+                 "not test_is_block_device"
 
-                        ;; These fail because of network (or specifically
-                        ;; IPv6 network) access.
-                        " and not test_accept"
-                        " and not test_accept_after_close"
-                        " and not test_close_during_receive"
-                        " and not test_close_from_other_task"
-                        " and not test_concurrent_receive"
-                        " and not test_concurrent_send"
-                        " and not test_connect_tcp_with_tls"
-                        " and not test_connect_tcp_with_tls_cert_check_fail"
-                        " and not test_connection_refused"
-                        " and not test_extra_attributes"
-                        " and not test_getaddrinfo"
-                        " and not test_getnameinfo"
-                        " and not test_happy_eyeballs"
-                        " and not test_iterate"
-                        " and not test_receive_after_close"
-                        " and not test_receive_timeout"
-                        " and not test_reuse_port"
-                        " and not test_run_process"
-                        " and not test_send_after_close"
-                        " and not test_send_after_eof"
-                        " and not test_send_after_peer_closed"
-                        " and not test_send_eof"
-                        " and not test_send_large_buffer"
-                        " and not test_send_receive"
-                        " and not test_socket_options"))))))))
+                 ;; These fail because of network (or specifically IPv6
+                 ;; network) access (see:
+                 ;; https://github.com/agronholm/anyio/issues/417).
+                 " and not test_accept"
+                 " and not test_accept_after_close"
+                 " and not test_close_during_receive"
+                 " and not test_close_from_other_task"
+                 " and not test_concurrent_receive"
+                 " and not test_concurrent_send"
+                 " and not test_connect_tcp_with_tls"
+                 " and not test_connect_tcp_with_tls_cert_check_fail"
+                 " and not test_connection_refused"
+                 " and not test_extra_attributes"
+                 " and not test_getaddrinfo"
+                 " and not test_getnameinfo"
+                 " and not test_happy_eyeballs"
+                 " and not test_iterate"
+                 " and not test_receive_after_close"
+                 " and not test_receive_timeout"
+                 " and not test_reuse_port"
+                 " and not test_run_process"
+                 " and not test_send_after_close"
+                 " and not test_send_after_eof"
+                 " and not test_send_after_peer_closed"
+                 " and not test_send_eof"
+                 " and not test_send_large_buffer"
+                 " and not test_send_receive"
+                 " and not test_socket_options"
+                 " and not test_unretrieved_future_exception_server_crash"))))))))
     (propagated-inputs
      (list python-idna python-sniffio python-typing-extensions))
     (native-inputs
      (list python-coverage
            python-hypothesis
-           python-iniconfig
            python-mock
-           python-pytest-6
+           python-pytest
            python-pytest-mock
-           python-pytest-trio
            python-setuptools-scm
+           python-trio
            python-trustme
            python-uvloop))
     (home-page "https://github.com/agronholm/anyio")
