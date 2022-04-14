@@ -13709,13 +13709,13 @@ convert an @code{.ipynb} notebook file into various static formats including:
 (define-public python-notebook
   (package
     (name "python-notebook")
-    (version "6.3.0")
+    (version "6.4.10")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "notebook" version))
               (sha256
                (base32
-                "0zfwr87ndjzmdp9adpc9lby1hdqdkjp2q7c9vff3wiw1dj6kkjfb"))))
+                "03p976xq1l9xf4djwk0snmywd0zck3i6gjngxsl874i8qrmsf214"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
@@ -13734,10 +13734,9 @@ convert an @code{.ipynb} notebook file into various static formats including:
              (setenv "HOME" (getcwd))))
          (replace 'check
            (lambda* (#:key tests? inputs outputs #:allow-other-keys)
-             ;; These tests require a browser
+             ;; These tests require a browser.
              (delete-file-recursively "notebook/tests/selenium")
              (when tests?
-               (add-installed-pythonpath inputs outputs)
                ;; Interferes with test expectations.
                (unsetenv "JUPYTER_CONFIG_PATH")
                ;; Some tests do not expect all files to be installed in the
@@ -13754,6 +13753,7 @@ convert an @code{.ipynb} notebook file into various static formats including:
            python-jinja2
            python-jupyter-client
            python-jupyter-core
+           python-nest-asyncio
            python-nbconvert
            python-nbformat
            python-prometheus-client
