@@ -5670,10 +5670,11 @@ writing C extensions for Python as easy as Python itself.")
                 "17fqacrpis05w1rpi7d7sbimrk20xf8h6d3vrz5nf6ix3899abil"))))
     (properties '())))
 
-(define-public python-numpy-next
+;;; Caution: python-numba is prone to break when updating numpy.
+(define-public python-numpy
   (package
-    (name "python-numpy-next")
-    (version "1.21.3")
+    (name "python-numpy")
+    (version "1.21.6")
     (source
      (origin
        (method url-fetch)
@@ -5682,50 +5683,52 @@ writing C extensions for Python as easy as Python itself.")
              version "/numpy-" version ".tar.gz"))
        (sha256
         (base32
-         "0s6hy8828yr7fcjiwnym4l8lrknr21gqfkaiawsf86n0hd0a5fyh"))))
+         "0b0c5y35rd3mvwfk5is1d5ppfw9nl4d2rgx9xkwh1p0w394wdvyl"))))
     (build-system python-build-system)
-    (inputs
-     (list openblas))
-    (native-inputs
-     (list python-cython python-hypothesis python-pytest
-           python-pytest-xdist gfortran))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'configure-blas
-           (lambda* (#:key inputs #:allow-other-keys)
-             (call-with-output-file "site.cfg"
-               (lambda (port)
-                 (format port
-                         "\
+     (list
+      #:modules '((guix build utils)
+                  (guix build python-build-system)
+                  (ice-9 format))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'parallelize-build
+            (lambda _
+              (setenv "NPY_NUM_BUILD_JOBS"
+                      (number->string (parallel-job-count)))))
+          (add-before 'build 'configure-blas
+            (lambda* (#:key inputs #:allow-other-keys)
+              (call-with-output-file "site.cfg"
+                (lambda (port)
+                  (format port
+                          "\
 [openblas]
 libraries = openblas
 library_dirs = ~a/lib
-include_dirs = ~a/include
-"
-                         (assoc-ref inputs "openblas")
-                         (assoc-ref inputs "openblas"))))))
-         (add-before 'build 'fix-executable-paths
-           (lambda* (#:key inputs #:allow-other-keys)
-             ;; Make /gnu/store/...-bash-.../bin/sh the default shell,
-             ;; instead of /bin/sh.
-             (substitute* "numpy/distutils/exec_command.py"
-               (("(os.environ.get\\('SHELL', ')(/bin/sh'\\))" match match-start match-end)
-                (string-append match-start (assoc-ref inputs "bash") match-end)))
-             ;; Use "gcc" executable, not "cc".
-             (substitute* "numpy/distutils/system_info.py"
-               (("c = distutils\\.ccompiler\\.new_compiler\\(\\)")
-                "c = distutils.ccompiler.new_compiler(); c.set_executables(compiler='gcc',compiler_so='gcc',linker_exe='gcc',linker_so='gcc -shared')"))))
-         (replace 'check
-           (lambda* (#:key tests? outputs inputs #:allow-other-keys)
-             (when tests?
-               ;; Make installed package available for running the tests.
-               (add-installed-pythonpath inputs outputs)
-               ;; Make sure "f2py" etc is found.
-               (setenv "PATH" (string-append (assoc-ref outputs "out") "/bin"
-                                             ":" (getenv "PATH")))
-               (invoke "./runtests.py"
-                       "-j" (number->string (parallel-job-count)))))))))
+include_dirs = ~:*~a/include~%" #$(this-package-input "openblas"))))))
+          (add-before 'build 'fix-executable-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Make /gnu/store/...-bash-.../bin/sh the default shell,
+              ;; instead of /bin/sh.
+              (substitute* "numpy/distutils/exec_command.py"
+                (("'/bin/sh'")
+                 (format #f "~s" (search-input-file inputs "bin/bash"))))))
+          (replace 'check
+            (lambda* (#:key tests? outputs inputs #:allow-other-keys)
+              (when tests?
+                (invoke "./runtests.py" "-vv" "--no-build" "--mode=fast"
+                        "-j" (number->string (parallel-job-count))
+                        ;; Contrary to scipy, the runtests.py script of numpy
+                        ;; does *not* automatically provide -n when -j is used
+                        ;; (see: https://github.com/numpy/numpy/issues/21359).
+                        "--" "-n" (number->string (parallel-job-count)))))))))
+    (native-inputs
+     (list python-cython
+           python-hypothesis-next
+           python-pytest
+           python-pytest-xdist
+           gfortran))
+    (inputs (list bash openblas))
     (home-page "https://numpy.org")
     (synopsis "Fundamental package for scientific computing with Python")
     (description "NumPy is the fundamental package for scientific computing
@@ -5739,7 +5742,7 @@ capabilities.")
 ;; Numpy 1.16.x are the last versions that support Python 2.
 (define-public python2-numpy
   (let ((numpy (package-with-python2
-                (strip-python2-variant python-numpy-next))))
+                (strip-python2-variant python-numpy))))
     (package
       (inherit numpy)
       (name "python-numpy")
@@ -5755,74 +5758,39 @@ capabilities.")
       (arguments
        (substitute-keyword-arguments (package-arguments numpy)
          ((#:phases phases)
-          `(modify-phases ,phases
-             (add-after 'unpack 'delete-failing-test
-               (lambda _
-                 ;; There's just one failing test here.
-                 (delete-file "numpy/linalg/tests/test_linalg.py")
-                 ;; ...and this one depends on the previous one.
-                 (delete-file "numpy/matrixlib/tests/test_matrix_linalg.py")))))))
+          #~(modify-phases #$phases
+              (add-after 'unpack 'delete-failing-tests
+                (lambda _
+                  ;; There's just one failing test here.
+                  (delete-file "numpy/linalg/tests/test_linalg.py")
+                  ;; ...and this one depends on the previous one.
+                  (delete-file "numpy/matrixlib/tests/test_matrix_linalg.py")))))))
       (native-inputs
        (list python2-cython python2-pytest gfortran)))))
-
-;; Needed by python-numba, see https://github.com/numba/numba/issues/7176
-(define-public python-numpy-1.20
-  (package
-    (inherit python-numpy-next)
-    (name "python-numpy")
-    (version "1.20.3")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "https://github.com/numpy/numpy/releases/download/v"
-                    version "/numpy-" version ".tar.gz"))
-              (sha256
-               (base32
-                "140zq9snx0di4id4g97vaw9zz8x2rfla5lp3a70j666f5030yd5p"))))
-    ;; 92 tests fail, many of them because parts of the temp file name
-    ;; accidentally ends up in a comparison.
-    (arguments
-     (substitute-keyword-arguments (package-arguments python-numpy-next)
-       ((#:tests? _ #t) #f)))))
-
-;; NOTE: when upgrading numpy please make sure that python-pandas and
-;; python-scipy still build, as these three packages are often used together.
-(define-public python-numpy python-numpy-1.20)
 
 ;; NOTE: NumPy 1.8 is packaged only for Python 2 because it is of
 ;; interest only for legacy code going back to NumPy's predecessor
 ;; Numeric.
 (define-public python2-numpy-1.8
-  (package (inherit python2-numpy)
+  (package
+    (inherit python2-numpy)
     (version "1.8.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-              (url "https://github.com/numpy/numpy")
-              (commit (string-append "v" version))))
+             (url "https://github.com/numpy/numpy")
+             (commit (string-append "v" version))))
        (file-name (git-file-name "numpy" version))
        (sha256
         (base32
          "0ikgi15rsqwbkfsjjxrwh40lqyal2wvyp3923y6w6ch3dcr82sfk"))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments python2-numpy)
-       ((#:phases phases)
-        `(modify-phases ,phases
-           (replace 'configure-blas
-             (lambda* (#:key inputs #:allow-other-keys)
-               (call-with-output-file "site.cfg"
-                 (lambda (port)
-                   (format port
-                           "[openblas]
-libraries = openblas
-library_dirs = ~a/lib
-include_dirs = ~a/include
-"
-                           (assoc-ref inputs "openblas")
-                           (assoc-ref inputs "openblas"))))))))))
-    (native-inputs
-     (list python2-nose))
+    (arguments (substitute-keyword-arguments (package-arguments python2-numpy)
+                 ((#:tests? _ #f) #f)   ;disable tests
+                 ((#:phases phases)
+                  #~(modify-phases #$phases
+                      (delete 'delete-failing-tests)))))
+    (native-inputs '())
     (description "NumPy is the fundamental package for scientific computing
 with Python.  It contains among other things: a powerful N-dimensional array
 object, sophisticated (broadcasting) functions, tools for integrating C/C++
