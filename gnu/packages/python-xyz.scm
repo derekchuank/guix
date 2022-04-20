@@ -15269,9 +15269,6 @@ document.")
    (home-page "https://github.com/jmespath/jmespath.py")
    (license license:expat)))
 
-(define-public python2-jmespath
-  (package-with-python2 python-jmespath))
-
 (define-public python-symengine
   (package
     (name "python-symengine")
