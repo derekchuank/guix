@@ -4095,9 +4095,6 @@ is designed to have a low barrier to entry.")
   Redis protocol.")
     (license license:bsd-2)))
 
-(define-public python2-trollius-redis
-  (package-with-python2 python-trollius-redis))
-
 (define-public python-sqlparse
   (package
     (name "python-sqlparse")
