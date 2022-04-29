@@ -22551,9 +22551,6 @@ Examples are:
 @end enumerate")
     (license license:bsd-3)))
 
-(define-public python2-funcy
-  (package-with-python2 python-funcy))
-
 (define-public python-isoweek
   (package
     (name "python-isoweek")
