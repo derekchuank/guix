@@ -18680,9 +18680,6 @@ multitouch applications.")
 Design spec without sacrificing ease of use or application performance.")
     (license license:expat)))
 
-(define-public python2-kivy
-  (package-with-python2 python-kivy))
-
 (define-public python-binaryornot
   (package
     (name "python-binaryornot")
