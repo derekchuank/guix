@@ -1785,28 +1785,6 @@ alone or in concert with Non Timeline and Non Sequencer to form a complete
 studio.")
     (license license:gpl2+)))
 
-(define-public non-timeline
-  (package (inherit non-sequencer)
-    (name "non-timeline")
-    (arguments
-     (substitute-keyword-arguments (package-arguments non-sequencer)
-       ((#:configure-flags flags)
-        `(cons "--project=timeline"
-               (delete "--project=sequencer" ,flags)))))
-    (inputs
-     (list jack-1 liblo libsndfile ntk))
-    (native-inputs
-     (list pkg-config))
-    (home-page "https://non.tuxfamily.org/wiki/Non%20Timeline")
-    (synopsis "Modular digital audio timeline arranger")
-    (description
-     "The Non Timeline is a powerful, reliable and fast modular digital audio
-timeline arranger.  It utilizes JACK for inter-application audio I/O and the
-NTK GUI toolkit for a fast and lightweight user interface.  Non Timeline can
-be used alone or in concert with Non Mixer and Non Sequencer to form a
-complete studio.")
-    (license license:gpl2+)))
-
 (define-public tascam-gtk
   ;; This commit represents the latest version at the time of this writing.
   (let ((commit "17b8575ff88dfd2ede0f7ef9c5c5597ab8a00702")
