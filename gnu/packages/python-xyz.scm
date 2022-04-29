@@ -19664,9 +19664,6 @@ JSON) codec.")
      through a Python API.")
     (license license:lgpl2.1+)))
 
-(define-public python2-pycountry
-  (package-with-python2 python-pycountry))
-
 (define-public python-pycosat
   (package
     (name "python-pycosat")
