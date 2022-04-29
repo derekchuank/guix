@@ -14984,9 +14984,6 @@ command-line applications, including tools for colored and indented
 output, progress bar display, and pipes.")
     (license license:isc)))
 
-(define-public python2-clint
-  (package-with-python2 python-clint))
-
 (define-public python-rply
   (package
     (name "python-rply")
