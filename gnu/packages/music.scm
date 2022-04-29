@@ -1763,28 +1763,6 @@ session management.  NSM clients use a well-specified OSC protocol to
 communicate with the session management daemon.")
     (license license:gpl2+)))
 
-(define-public non-mixer
-  (package (inherit non-sequencer)
-    (name "non-mixer")
-    (arguments
-     (substitute-keyword-arguments (package-arguments non-sequencer)
-       ((#:configure-flags flags)
-        `(cons "--project=mixer"
-               (delete "--project=sequencer" ,flags)))))
-    (inputs
-     (list jack-1 liblo ladspa lrdf ntk))
-    (native-inputs
-     (list pkg-config))
-    (home-page "https://non.tuxfamily.org/wiki/Non%20Mixer")
-    (synopsis "Modular digital audio mixer")
-    (description
-     "The Non Mixer is a powerful, reliable and fast modular digital audio
-mixer.  It utilizes JACK for inter-application audio I/O and the NTK GUI
-toolkit for a fast and lightweight user interface.  Non Mixer can be used
-alone or in concert with Non Timeline and Non Sequencer to form a complete
-studio.")
-    (license license:gpl2+)))
-
 (define-public tascam-gtk
   ;; This commit represents the latest version at the time of this writing.
   (let ((commit "17b8575ff88dfd2ede0f7ef9c5c5597ab8a00702")
