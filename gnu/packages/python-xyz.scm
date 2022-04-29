@@ -22151,9 +22151,6 @@ such as figshare or Zenodo.")
 @url{Semantic Versioning, http://semver.org/}.")
     (license license:bsd-3)))
 
-(define-public python2-semver
-  (package-with-python2 python-semver))
-
 (define-public python-pyro4
   (package
     (name "python-pyro4")
