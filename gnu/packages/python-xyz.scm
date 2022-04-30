@@ -22427,9 +22427,6 @@ interpreter. bpython's main features are
 file system events on Linux.")
     (license license:expat)))
 
-(define-public python2-pyinotify
-  (package-with-python2 python-pyinotify))
-
 
 (define-public python-more-itertools
   (package
