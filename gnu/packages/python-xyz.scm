@@ -19317,9 +19317,6 @@ JSON) codec.")
      protocols.")
     (license license:expat)))
 
-(define-public python2-attrs
-  (package-with-python2 python-attrs))
-
 (define-public python-attrs-bootstrap
   (package
     (inherit python-attrs)
