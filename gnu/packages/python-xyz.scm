@@ -20463,9 +20463,6 @@ while only declaring the test-specific fields.")
      applying JSON Patches according to RFC 6902.")
     (license license:bsd-3)))
 
-(define-public python2-jsonpatch
-  (package-with-python2 python-jsonpatch))
-
 (define-public python-jsonpatch-0.4
   (package (inherit python-jsonpatch)
     (name "python-jsonpatch")
