@@ -16770,9 +16770,6 @@ Wikipedia code samples at
 docstring and colored output.")
     (license license:expat)))
 
-(define-public python2-cleo
-  (package-with-python2 python-cleo))
-
 (define-public python-tomlkit
   (package
     (name "python-tomlkit")
