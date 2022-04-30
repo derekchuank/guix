@@ -20775,9 +20775,6 @@ while only declaring the test-specific fields.")
     (description "@code{flex} can be used to validate Swagger schemata.")
     (license license:bsd-3)))
 
-(define-public python2-flex
-  (package-with-python2 python-flex))
-
 (define-public python-marshmallow
   (package
     (name "python-marshmallow")
