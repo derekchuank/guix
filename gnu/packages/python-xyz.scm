@@ -25591,9 +25591,6 @@ custom PNG processing.")
 sequences.")
     (license license:gpl2)))
 
-(define-public python2-fuzzywuzzy
-  (package-with-python2 python-fuzzywuzzy))
-
 (define-public python-block-tracing
   (package
     (name "python-block-tracing")
