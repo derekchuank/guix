@@ -17442,9 +17442,6 @@ simple, lightweight implementation.")
 parsing UK postcodes.")
     (license license:expat)))
 
-(define-public python2-ukpostcodeparser
-  (package-with-python2 python-ukpostcodeparser))
-
 (define-public python-faker
   (package
     (name "python-faker")
