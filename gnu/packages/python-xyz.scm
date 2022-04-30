@@ -19369,9 +19369,6 @@ JSON) codec.")
      and bit flag values.")
     (license license:expat)))
 
-(define-public python2-constantly
-  (package-with-python2 python-constantly))
-
 (define-public python-attrs
   (package
     (name "python-attrs")
