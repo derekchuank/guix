@@ -17138,9 +17138,6 @@ and pluralizes English words, and transforms strings from CamelCase to
 underscored string.")
     (license license:expat)))
 
-(define-public python2-inflection
-  (package-with-python2 python-inflection))
-
 (define-public python-pylev
   (package
     (name "python-pylev")
