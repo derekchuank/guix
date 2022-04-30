@@ -19599,9 +19599,6 @@ JSON) codec.")
      projects.")
     (license license:expat)))
 
-(define-public python2-incremental
-  (package-with-python2 python-incremental))
-
 (define-public python-invoke
   (package
     (name "python-invoke")
