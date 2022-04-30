@@ -18527,9 +18527,6 @@ JSON) codec.")
      discovery, monitoring and configuration.")
     (license license:expat)))
 
-(define-public python2-consul
-  (package-with-python2 python-consul))
-
 (define-public python-schematics
   (package
     (name "python-schematics")
