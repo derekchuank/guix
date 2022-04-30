@@ -1701,67 +1701,33 @@ music theorist Paul Nauert's quantization grids or Q-Grids, for short.")
 @code{jupyter} notebooks.")
     (license license:expat)))
 
-(define-public non-sequencer
-  ;; The latest tagged release is three years old and uses a custom build
-  ;; system, so we take the last commit.
-  (let ((commit "5ae43bb27c42387052a73e5ffc5d33efb9d946a9")
-        (revision "4"))
-    (package
-      (name "non-sequencer")
-      (version (string-append "1.9.5-" revision "." (string-take commit 7)))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "git://git.tuxfamily.org/gitroot/non/non.git")
-                      (commit commit)))
-                (sha256
-                 (base32
-                  "1cljkkyi9dxqpqhx8y6l2ja4zjmlya26m26kqxml8gx08vyvddhx"))
-                (file-name (string-append name "-" version "-checkout"))))
-      (build-system waf-build-system)
-      (arguments
-       `(#:tests? #f ;no "check" target
-         #:configure-flags
-         (list "--project=sequencer"
-               ;; Disable the use of SSE unless on x86_64.
-               ,@(if (not (string-prefix? "x86_64" (or (%current-target-system)
-                                                       (%current-system))))
-                     '("--disable-sse")
-                     '()))
-         #:python ,python-2))
-      (inputs
-       (list jack-1 libsigc++-2 liblo ntk))
-      (native-inputs
-       (list pkg-config))
-      (home-page "https://non.tuxfamily.org/wiki/Non%20Sequencer")
-      (synopsis "Pattern-based MIDI sequencer")
-      (description
-       "The Non Sequencer is a powerful, lightweight, real-time,
-pattern-based MIDI sequencer.  It utilizes the JACK Audio Connection Kit for
-MIDI I/O and the NTK GUI toolkit for its user interface.  Everything in Non
-Sequencer happens on-line, in real-time.  Music can be composed live, while the
-transport is rolling.")
-      (license license:gpl2+))))
+(define-public new-session-manager
+  (package
+    (name "new-session-manager")
+    (version "1.6.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/jackaudio/new-session-manager")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0ihngqbnc50izfy6x7nhgaah00byk8nl6n5smxbyb8fkhm2s8p21"))))
+    (build-system meson-build-system)
+    (native-inputs (list pkg-config))
+    (inputs (list fltk jack-2 liblo libx11))
+    (home-page "https://new-session-manager.jackaudio.org/")
+    (synopsis "Music production session management tool")
+    (description "New Session Manager (NSM) is a tool to assist music
+production by grouping standalone programs into sessions.  It can be used
+create a session, or project, and add programs to it and then use commands to
+save, start/stop, hide/show all programs at once, or individually.  The
+session can be interrupted and easily resumed at a later time.")
+    (license license:gpl3+)))
 
 (define-public non-session-manager
-  (package (inherit non-sequencer)
-    (name "non-session-manager")
-    (arguments
-     (substitute-keyword-arguments (package-arguments non-sequencer)
-       ((#:configure-flags flags)
-        `(cons "--project=session-manager"
-               (delete "--project=sequencer" ,flags)))))
-    (inputs
-     (list jack-1 liblo ntk))
-    (native-inputs
-     (list pkg-config))
-    (home-page "https://non.tuxfamily.org/nsm/")
-    (synopsis "Audio session management")
-    (description
-     "The Non Session Manager is an API and an implementation for audio
-session management.  NSM clients use a well-specified OSC protocol to
-communicate with the session management daemon.")
-    (license license:gpl2+)))
+  (deprecated-package "non-session-manager" new-session-manager))
 
 (define-public tascam-gtk
   ;; This commit represents the latest version at the time of this writing.
@@ -2204,7 +2170,7 @@ perform creative live mixes with digital music files.")
      (list jack-1
            lv2
            alsa-lib
-           non-session-manager
+           new-session-manager
            liblo
            qtbase-5))
     (native-inputs
@@ -2236,7 +2202,7 @@ oscillators and stereo effects.")
            lv2
            libsndfile
            alsa-lib
-           non-session-manager
+           new-session-manager
            liblo
            qtbase-5))
     (native-inputs
@@ -2268,7 +2234,7 @@ effects.")
            lv2
            libsndfile
            alsa-lib
-           non-session-manager
+           new-session-manager
            liblo
            qtbase-5))
     (native-inputs
@@ -2299,7 +2265,7 @@ effects.")
      (list jack-1
            lv2
            alsa-lib
-           non-session-manager
+           new-session-manager
            liblo
            fftwf
            qtbase-5))
