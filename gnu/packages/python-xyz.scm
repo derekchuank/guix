@@ -16317,9 +16317,6 @@ check if a package meets certain version requirements, query CFLAGS and
 LDFLAGS and parse the output to build extensions with setup.py.")
     (license license:expat)))
 
-(define-public python2-pkgconfig
-  (package-with-python2 python-pkgconfig))
-
 (define-public python-bz2file
   (package
     (name "python-bz2file")
