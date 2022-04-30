@@ -11482,9 +11482,6 @@ command and compares the command output in the test with the command’s actual
 output.")
     (license license:gpl2+)))
 
-(define-public python2-cram
-  (package-with-python2 python-cram))
-
 (define-public python-crccheck
   (package
     (name "python-crccheck")
