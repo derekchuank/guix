@@ -22669,9 +22669,6 @@ and corruption checks.")
 library to allow local file system access via @code{file://} URLs.")
     (license license:asl2.0)))
 
-(define-public python2-requests-file
-  (package-with-python2 python-requests-file))
-
 (define-public python-identify
   (package
     (name "python-identify")
