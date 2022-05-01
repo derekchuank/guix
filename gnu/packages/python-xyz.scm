@@ -18924,9 +18924,6 @@ builds partial trees by inspecting living objects.")
      in other versions.")
     (license license:expat)))
 
-(define-public python2-configparser
-  (package-with-python2 python-configparser))
-
 (define-public python-iniconfig
   (package
     (name "python-iniconfig")
