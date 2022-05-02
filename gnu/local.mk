@@ -633,6 +633,11 @@ GNU_SYSTEM_MODULES =				\
 						\
   %D%/platforms/arm.scm		                \
   %D%/platforms/hurd.scm	                \
+  %D%/platforms/intel.scm	                \
+  %D%/platforms/mips.scm	                \
+  %D%/platforms/powerpc.scm	                \
+  %D%/platforms/riscv.scm	                \
+  %D%/platforms/s390.scm	                \
 						\
   %D%/services.scm				\
   %D%/services/admin.scm			\
