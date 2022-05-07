@@ -25,4 +25,5 @@
 (define hurd
   (platform
    (target "i586-pc-gnu")
-   (system "i586-gnu")))
+   (system "i586-gnu")
+   (glibc-dynamic-linker "/lib/ld.so.1")))

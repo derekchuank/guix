@@ -26,4 +26,5 @@
   (platform
    (target "mips64el-linux-gnu")
    (system "mips64el-linux")
-   (linux-architecture "mips")))
+   (linux-architecture "mips")
+   (glibc-dynamic-linker "/lib/ld.so.1")))
